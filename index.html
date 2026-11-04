@@ -309,7 +309,16 @@ Thông tin tài khoản:
       }, 3500);
     }
 
-    function downloadLocalMobileConfig() {
+  function downloadLocalMobileConfig() {
+      const uuid1 = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+      const uuid2 = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+
       const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -331,7 +340,7 @@ Thông tin tài khoản:
       <key>PayloadType</key>
       <string>com.apple.dnsSettings.managed</string>
       <key>PayloadUUID</key>
-      <string>88392011-ABCD-1234-EF00-${Date.now().toString().slice(-12)}</string>
+      <string>${uuid1}</string>
       <key>PayloadVersion</key>
       <integer>1</integer>
     </dict>
@@ -342,6 +351,8 @@ Thông tin tài khoản:
   <string>com.jaydev.profile.${currentUsername}</string>
   <key>PayloadType</key>
   <string>Configuration</string>
+  <key>PayloadUUID</key>
+  <string>${uuid2}</string>
   <key>PayloadVersion</key>
   <integer>1</integer>
 </dict>
@@ -357,7 +368,6 @@ Thông tin tài khoản:
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
-
     window.addEventListener("DOMContentLoaded", () => {
       updateQuickReply(currentUsername, currentDownloadUrl);
       syncAllData();
