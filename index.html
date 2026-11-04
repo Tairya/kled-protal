@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JayDev Portal v3.5 - Hệ Thống Kích Hoạt Locket Gold & Spotify VIP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #09090b; color: #f4f4f5; }
+    .gold-gradient { background: linear-gradient(135deg, #FACC15 0%, #EAB308 100%); }
+    .card-dark { background: #18181b; border: 1px solid #27272a; border-radius: 16px; }
+    .card-gold-border { border: 1px solid rgba(250, 204, 21, 0.3); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- TOP NAVBAR & CREDITS WIDGET -->
+  <header class="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center text-zinc-950 font-black text-xl shadow-lg shadow-yellow-500/20">
+          J
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-lg tracking-tight text-white">JAYDEV PORTAL</h1>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">v3.5 PRO</span>
+          </div>
+          <p class="text-xs text-zinc-400" id="ctvNameDisplay">Chưa kết nối API Key</p>
+        </div>
+      </div>
+
+      <!-- WIDGET SỐ DƯ & LƯỢT (CREDITS vs TOTAL PURCHASED) -->
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2 gap-4">
+          <div>
+            <span class="text-[11px] text-zinc-400 block uppercase font-semibold">Số lượt hiện còn (Credits)</span>
+            <span class="text-lg font-extrabold text-yellow-400" id="navCredits">0</span>
+          </div>
+          <div class="h-7 w-[1px] bg-zinc-800"></div>
+          <div>
+            <span class="text-[11px] text-zinc-400 block uppercase font-semibold">Tổng lượt đã nạp</span>
+            <span class="text-lg font-bold text-emerald-400" id="navTotalPurchased">0</span>
+          </div>
+          <div class="h-7 w-[1px] bg-zinc-800"></div>
+          <div>
+            <span class="text-[11px] text-zinc-400 block uppercase font-semibold">Khách Active</span>
+            <span class="text-lg font-bold text-blue-400" id="navActiveClients">0</span>
+          </div>
+        </div>
+
+        <!-- NÚT CHẾ ĐỘ MOCK/FREE LOCAL -->
+        <label class="flex items-center gap-2 cursor-pointer bg-zinc-900 border border-zinc-700 px-3 py-2 rounded-xl hover:border-yellow-500/50 transition">
+          <input type="checkbox" id="mockModeToggle" class="sr-only peer" checked onchange="toggleMode()">
+          <div class="w-9 h-5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all relative peer-checked:bg-emerald-500"></div>
+          <span class="text-xs font-semibold text-zinc-200">Chế độ Local Free (Mock)</span>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-7xl mx-auto px-4 py-6 w-full space-y-6">
+
+    <!-- CẤU HÌNH API KEY & SERVER -->
+    <section class="card-dark p-5 card-gold-border">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+        <div class="md:col-span-4">
+          <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1.5">
+            <i class="fa-solid fa-server mr-1 text-yellow-400"></i> Server Base URL
+          </label>
+          <select id="baseUrlSelect" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-yellow-400">
+            <option value="/proxy">Qua Localhost Proxy (Khuyên dùng - Chống lỗi SSL/CORS)</option>
+            <option value="https://locket.jayteam.click">https://locket.jayteam.click (Domain đại diện)</option>
+            <option value="https://180.93.61.146">https://180.93.61.146 (Direct IP)</option>
+          </select>
+        </div>
+
+        <div class="md:col-span-5">
+          <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1.5">
+            <i class="fa-solid fa-key mr-1 text-yellow-400"></i> Header X-API-Key (32 - 64 ký tự)
+          </label>
+          <div class="relative">
+            <input type="password" id="apiKeyInput" placeholder="Nhập JAYDEV_YOUR_API_KEY_HERE..." 
+              class="w-full bg-zinc-900 border border-zinc-700 rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-yellow-400" />
+            <button type="button" onclick="toggleShowKey()" class="absolute right-3 top-2.5 text-zinc-400 hover:text-white">
+              <i class="fa-solid fa-eye" id="eyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="md:col-span-3 flex gap-2">
+          <button onclick="syncAllData()" class="w-full gold-gradient text-zinc-950 font-bold py-2.5 px-4 rounded-xl text-sm hover:opacity-95 transition flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/10">
+            <i class="fa-solid fa-rotate"></i> Kiểm Tra & Đồng Bộ
+          </button>
+        </div>
+      </div>
+      <div id="apiStatusAlert" class="mt-3 text-xs text-emerald-400 hidden"></div>
+    </section>
+
+    <!-- KHU VỰC CHÍNH: KÍCH HOẠT VIP & TIN NHẮN NHANH -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- FORM KÍCH HOẠT LOCKET GOLD / SPOTIFY / YOUTUBE (5 CỘT) -->
+      <div class="lg:col-span-5 card-dark p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+          <div>
+            <h2 class="text-base font-extrabold text-yellow-400 flex items-center gap-2">
+              <i class="fa-solid fa-bolt"></i> KÍCH HOẠT DỊCH VỤ & TẠO DNS
+            </h2>
+            <p class="text-xs text-zinc-400 mt-0.5">Endpoint: <code class="text-zinc-300">POST /api/v1/dns/export-dns</code></p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1">Username Locket hoặc UID Khách Hàng *</label>
+            <input type="text" id="clientUsername" placeholder="Ví dụ: linh_dan_2005" 
+              class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-yellow-400" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-zinc-300 mb-1">Tên gói cước</label>
+              <select id="packageName" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-yellow-400">
+                <option value="Locket Gold Vĩnh Viễn VIP">Locket Gold Vĩnh Viễn VIP</option>
+                <option value="Combo Locket + Spotify + YT">Combo Locket + Spotify + YT</option>
+                <option value="Locket Gold 1 Năm">Locket Gold 1 Năm</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-zinc-300 mb-1">Thời hạn (Ngày)</label>
+              <input type="number" id="packageDays" value="9999" 
+                class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-yellow-400" />
+            </div>
+          </div>
+
+          <!-- CÁC TÍNH NĂNG MỞ KHÓA (FEATURES) -->
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-2">Đặc quyền tích hợp vào cấu hình DNS:</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 bg-zinc-900/70 p-3.5 rounded-xl border border-zinc-800">
+              <label class="flex items-center gap-2.5 text-sm cursor-pointer">
+                <input type="checkbox" id="feat_locket" checked class="w-4 h-4 accent-yellow-400 rounded">
+                <span>💛 Locket Gold VIP</span>
+              </label>
+              <label class="flex items-center gap-2.5 text-sm cursor-pointer">
+                <input type="checkbox" id="feat_spotify" checked class="w-4 h-4 accent-emerald-400 rounded">
+                <span>🎵 Spotify Premium</span>
+              </label>
+              <label class="flex items-center gap-2.5 text-sm cursor-pointer">
+                <input type="checkbox" id="feat_youtube" checked class="w-4 h-4 accent-red-500 rounded">
+                <span>🚫 Adblock YouTube</span>
+              </label>
+              <label class="flex items-center gap-2.5 text-sm cursor-pointer">
+                <input type="checkbox" id="feat_photobooth" checked class="w-4 h-4 accent-pink-400 rounded">
+                <span>📸 17 Khung Photobooth</span>
+              </label>
+              <label class="flex items-center gap-2.5 text-sm cursor-pointer sm:col-span-2">
+                <input type="checkbox" id="feat_video60s" checked class="w-4 h-4 accent-blue-400 rounded">
+                <span>🎬 Quay Video 60s & Up Từ Thư Viện</span>
+              </label>
+            </div>
+          </div>
+
+          <button onclick="activateClient()" class="w-full gold-gradient text-zinc-950 font-extrabold py-3 px-4 rounded-xl text-sm hover:opacity-95 transition flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> KÍCH HOẠT NGAY & XUẤT LINK DNS
+          </button>
+        </div>
+
+        <!-- KẾT QUẢ KÍCH HOẠT -->
+        <div id="activationResultBox" class="hidden bg-zinc-900 border border-emerald-500/40 rounded-xl p-4 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-400 uppercase"><i class="fa-solid fa-circle-check mr-1"></i> Kích hoạt thành công!</span>
+            <span id="resCode" class="text-xs font-mono bg-zinc-800 px-2 py-0.5 rounded text-yellow-300">JAY-VIP</span>
+          </div>
+          <div class="text-xs space-y-1 text-zinc-300">
+            <p>Khách hàng: <strong class="text-white" id="resUser">-</strong> | Hạn: <strong class="text-emerald-400" id="resExp">Vĩnh viễn</strong></p>
+            <p class="truncate">Link DNS: <a id="resLink" href="#" target="_blank" class="text-blue-400 underline font-mono">-</a></p>
+          </div>
+          <div class="flex gap-2 pt-1">
+            <button onclick="copyDnsLink()" class="flex-1 bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold py-2 rounded-lg transition">
+              <i class="fa-regular fa-copy mr-1"></i> Copy Link DNS
+            </button>
+            <button onclick="downloadLocalMobileConfig()" class="flex-1 bg-blue-600/20 border border-blue-500/40 hover:bg-blue-600/30 text-blue-300 text-xs font-semibold py-2 rounded-lg transition">
+              <i class="fa-solid fa-download mr-1"></i> Tải File .mobileconfig
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KHO TIN NHẮN NHANH GỬI KHÁCH HÀNG (7 CỘT) -->
+      <div class="lg:col-span-7 card-dark p-6 flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-3 mb-4">
+            <div>
+              <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                <i class="fa-solid fa-comment-dots text-yellow-400"></i> KHO TIN NHẮN NHANH GỬI KHÁCH (QUICK REPLIES)
+              </h2>
+              <p class="text-xs text-zinc-400 mt-0.5">Tự động điền <code class="text-yellow-300">{USERNAME}</code> và <code class="text-yellow-300">{DOWNLOAD_URL}</code> sau khi kích hoạt</p>
+            </div>
+          </div>
+
+          <!-- TABS CHỌN MẪU TIN NHẮN -->
+          <div class="flex flex-wrap gap-2 mb-3">
+            <button onclick="selectQuickReply(1)" id="tabBtn1" class="text-xs font-bold px-3.5 py-2 rounded-xl bg-yellow-400 text-zinc-950 transition">
+              Mẫu 1: Gửi Link Cài Đặt (Phổ biến nhất)
+            </button>
+            <button onclick="selectQuickReply(2)" id="tabBtn2" class="text-xs font-semibold px-3.5 py-2 rounded-xl bg-zinc-900 text-zinc-300 hover:bg-zinc-800 transition">
+              Mẫu 2: Hướng Dẫn Photobooth & Filter AI
+            </button>
+            <button onclick="selectQuickReply(3)" id="tabBtn3" class="text-xs font-semibold px-3.5 py-2 rounded-xl bg-zinc-900 text-zinc-300 hover:bg-zinc-800 transition">
+              Mẫu 3: Bảo Hành Khi Đổi Máy / Mất Huy Hiệu
+            </button>
+          </div>
+
+          <textarea id="quickReplyContent" rows="12" 
+            class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-xs leading-relaxed text-zinc-200 font-mono focus:outline-none focus:border-yellow-400"></textarea>
+        </div>
+
+        <div class="flex items-center justify-between gap-3 pt-2">
+          <span class="text-xs text-zinc-400" id="copyStatusText">Sẵn sàng copy gửi qua Zalo / Messenger / Telegram</span>
+          <button onclick="copyQuickMessage()" class="bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-extrabold px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+            <i class="fa-solid fa-copy"></i> COPY TIN NHẮN GỬI KHÁCH
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BẢNG THỐNG KÊ KHÁCH HÀNG (DASHBOARD STATS) -->
+    <section class="card-dark p-6 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 pb-4">
+        <div>
+          <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+            <i class="fa-solid fa-chart-pie text-yellow-400"></i> THỐNG KÊ KHÁCH HÀNG CỦA API KEY
+          </h2>
+          <p class="text-xs text-zinc-400 mt-0.5">Endpoint: <code class="text-zinc-300">GET /api/v1/dns/dashboard-stats</code></p>
+        </div>
+
+        <!-- 5 CHỈ SỐ SUMMARY -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 w-full lg:w-auto">
+          <div class="bg-zinc-900 border border-zinc-800 px-3.5 py-2 rounded-xl text-center">
+            <span class="text-[10px] text-zinc-400 uppercase block">Tổng Đã Nạp</span>
+            <span class="text-sm font-extrabold text-white" id="statTotalPurchased">200</span>
+          </div>
+          <div class="bg-zinc-900 border border-zinc-800 px-3.5 py-2 rounded-xl text-center">
+            <span class="text-[10px] text-zinc-400 uppercase block">Lượt Còn Lại</span>
+            <span class="text-sm font-extrabold text-yellow-400" id="statRemaining">45</span>
+          </div>
+          <div class="bg-zinc-900 border border-zinc-800 px-3.5 py-2 rounded-xl text-center">
+            <span class="text-[10px] text-zinc-400 uppercase block">Đã Sử Dụng</span>
+            <span class="text-sm font-extrabold text-purple-400" id="statUsed">155</span>
+          </div>
+          <div class="bg-zinc-900 border border-zinc-800 px-3.5 py-2 rounded-xl text-center">
+            <span class="text-[10px] text-zinc-400 uppercase block">Đang Active</span>
+            <span class="text-sm font-extrabold text-emerald-400" id="statActive">149</span>
+          </div>
+          <div class="bg-zinc-900 border border-zinc-800 px-3.5 py-2 rounded-xl text-center">
+            <span class="text-[10px] text-zinc-400 uppercase block">Hết Hạn</span>
+            <span class="text-sm font-extrabold text-rose-400" id="statExpired">6</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-zinc-800 text-[11px] uppercase text-zinc-400">
+              <th class="py-3 px-4">ID</th>
+              <th class="py-3 px-4">Locket Username</th>
+              <th class="py-3 px-4">Tên Gói Cước</th>
+              <th class="py-3 px-4">Thời Gian Kích Hoạt</th>
+              <th class="py-3 px-4">Trạng Thái DNS</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4 text-right">Thao Tác Nhanh</th>
+            </tr>
+          </thead>
+          <tbody id="clientsTableBody" class="divide-y divide-zinc-800/60 text-xs">
+            <!-- Dữ liệu render tự động bằng JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PHẦN 5: TRUNG TÂM HỖ TRỢ AE TEAM JAYDEV (2 MÃ QR SONG SONG BẮT BUỘC THEO SPEC) -->
+    <section style="background: linear-gradient(135deg, #18181b 0%, #09090b 100%); padding: 28px; border-radius: 20px; border: 1px solid rgba(255, 215, 0, 0.25); max-width: 760px; margin: 28px auto; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);">
+      <div class="text-center mb-6">
+        <h3 class="text-xl font-extrabold text-yellow-400 mb-1.5">
+          TRUNG TÂM HỖ TRỢ AE TEAM JAYDEV
+        </h3>
+        <p class="text-xs text-zinc-400">
+          Quét mã QR hoặc nhấn vào liên kết bên dưới để kết nối trực tiếp với Admin & Nhóm Hỗ Trợ
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <!-- CARD 1: FACEBOOK ADMIN JAY TRẦN -->
+        <div class="bg-zinc-800/90 rounded-2xl p-5 text-center border border-zinc-700 flex flex-col items-center">
+          <div class="inline-block p-2.5 bg-white rounded-xl mb-3.5 shadow-md">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=https%3A%2F%2Fweb.facebook.com%2Fjaytran0522" 
+                 alt="QR Facebook Jay Tran" width="180" height="180" class="block" />
+          </div>
+          <h4 class="text-base font-bold text-blue-400 mb-1">Facebook Admin Jay Trần</h4>
+          <p class="text-xs text-zinc-400 mb-4">Hỗ trợ nạp số lượt, bảo hành & giải đáp kỹ thuật 24/7</p>
+          <a href="https://web.facebook.com/jaytran0522" target="_blank" rel="noreferrer"
+             class="mt-auto inline-block bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-lg text-xs font-semibold transition">
+            <i class="fa-brands fa-facebook mr-1.5"></i> Nhắn Tin Facebook
+          </a>
+        </div>
+
+        <!-- CARD 2: TIKTOK NHÓM SUPPORT -->
+        <div class="bg-zinc-800/90 rounded-2xl p-5 text-center border border-zinc-700 flex flex-col items-center">
+          <div class="inline-block p-2.5 bg-white rounded-xl mb-3.5 shadow-md">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=https%3A%2F%2Fwww.tiktok.com%2F%40itlamtruyenthong0" 
+                 alt="QR TikTok itlamtruyenthong0" width="180" height="180" class="block" />
+          </div>
+          <h4 class="text-base font-bold text-rose-400 mb-1">TikTok @itlamtruyenthong0</h4>
+          <p class="text-xs text-zinc-400 mb-4">Kênh cập nhật công nghệ, video hướng dẫn & nhóm support</p>
+          <a href="https://www.tiktok.com/@itlamtruyenthong0" target="_blank" rel="noreferrer"
+             class="mt-auto inline-block bg-rose-600 hover:bg-rose-500 text-white px-5 py-2.5 rounded-lg text-xs font-semibold transition">
+            <i class="fa-brands fa-tiktok mr-1.5"></i> Truy Cập TikTok
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-zinc-900 py-4 text-center text-xs text-zinc-500">
+    Mã tài liệu: <code class="text-zinc-400">JAYDEV-AGENT-SPEC-2026</code> | Phiên bản: <code class="text-zinc-400">v3.5 - Production Ready</code>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // State quản lý dữ liệu
+    let currentUsername = "linh_dan_2005";
+    let currentDownloadUrl = "https://180.93.61.146/locket.mobileconfig?token=linh_dan_2005";
+    let currentTab = 1;
+
+    // Dữ liệu Mock ban đầu theo đúng JSON Spec
+    let mockState = {
+      credits: 999,
+      total_purchased: 1000,
+      total_used: 156,
+      active_clients: 150,
+      expired_clients: 6,
+      user: {
+        id: 12,
+        name: "Localhost Dev - Team JayDev (Chế Độ Free)",
+        username: "ctv_localhost",
+        role: "CTV",
+        status: "ACTIVE"
+      },
+      recent_clients: [
+        {
+          id: 1082,
+          locket_username: "linh_dan_2005",
+          package_name: "Locket Gold Vĩnh Viễn VIP",
+          created_at: "2026-11-04 17:30:12",
+          is_dns_active: true,
+          status: "ACTIVE"
+        },
+        {
+          id: 1081,
+          locket_username: "hoang_nam_kpop",
+          package_name: "Locket Gold 1 Năm",
+          created_at: "2026-11-04 16:15:00",
+          is_dns_active: true,
+          status: "ACTIVE"
+        }
+      ]
+    };
+
+    // 3 Mẫu Tin Nhắn Nhanh chuẩn từ tài liệu
+    function getQuickReplyTemplate(tabIndex, username, downloadUrl) {
+      if (tabIndex === 1) {
+        return `💛 CHÚC MỪNG BẠN ĐÃ KÍCH HOẠT THÀNH CÔNG LOCKET GOLD VIP! 💛
+
+Thông tin tài khoản:
+- Username: @${username}
+- Gói cước: Locket Gold Vĩnh Viễn (Full Khung Photobooth + Quay 30s/60s + Up Video Thư Viện)
+
+📲 CÁCH CÀI ĐẶT 2 BƯỚC CỰC DỄ TRÊN IPHONE:
+1️⃣ Bước 1: Mở trình duyệt Safari trên iPhone, bấm vào link dưới đây để tải Cấu Hình DNS:
+👉 ${downloadUrl}
+(Bấm Cho Phép -> Đã tải về hồ sơ)
+
+2️⃣ Bước 2: Kích hoạt trên máy:
+- Vào Cài đặt iPhone -> Đã tải về hồ sơ -> Bấm Cài đặt ở góc phải.
+- Tiếp tục vào: Cài đặt -> Cài đặt chung -> Giới thiệu -> Cài đặt tin cậy chứng nhận -> Gạt BẬT XANH "LocketGold Custom Root CA".
+
+3️⃣ Bước 3: Vuốt tắt app Locket trong đa nhiệm rồi mở lại để tận hưởng trọn vẹn đặc quyền Gold!
+
+📞 Nhóm hỗ trợ kỹ thuật JayDev: https://www.tiktok.com/@itlamtruyenthong0
+👤 Facebook Admin: https://web.facebook.com/jaytran0522`;
+      }
+      if (tabIndex === 2) {
+        return `📸 HƯỚNG DẪN DÙNG KHUNG PHOTOBOOTH & FILTER AI TRÊN LOCKET:
+
+1. Sau khi cài xong DNS Gold, bạn mở Camera Locket lên.
+2. Tại thanh trượt dưới nút chụp ảnh, vuốt sang phải sẽ thấy sẵn 17 Khung Photobooth cực xinh:
+   - Photobooth 4 Ô (Trend Hàn Quốc)
+   - Sweet Photobooth, Hello Kitty, Shin Chan viền mảnh, Nơ ren pastel...
+3. Bấm vào nút "✨ Tạo diện mạo" hoặc biểu tượng ngôi sao để chọn thêm các filter AI (Màu film Kodak, Cyberpunk, Y2K...).
+
+⚠️ Lưu ý: Khi chụp khung photobooth hoặc nghe nhạc Spotify, luôn giữ cấu hình DNS ở trạng thái Bật trong Cài đặt iPhone nhé!`;
+      }
+      return `Dạ bạn ơi, nếu bạn vừa cập nhật iOS hoặc đổi điện thoại mới:
+1. Bạn chỉ cần dùng Safari vào lại link cũ của bạn: ${downloadUrl}
+2. Bấm Cài đặt lại hồ sơ DNS và Bật tin cậy chứng chỉ là tài khoản tự động nhận lại Locket Gold 100%, không bị mất gói nha!
+3. Nếu cần hỗ trợ trực tiếp, nhắn ngay cho admin Jay Trần qua Facebook: https://web.facebook.com/jaytran0522 để được cấp lại link tức thì ạ!`;
+    }
+
+    function selectQuickReply(tabIndex) {
+      currentTab = tabIndex;
+      [1, 2, 3].forEach(i => {
+        const btn = document.getElementById(`tabBtn${i}`);
+        if (i === tabIndex) {
+          btn.className = "text-xs font-bold px-3.5 py-2 rounded-xl bg-yellow-400 text-zinc-950 transition";
+        } else {
+          btn.className = "text-xs font-semibold px-3.5 py-2 rounded-xl bg-zinc-900 text-zinc-300 hover:bg-zinc-800 transition";
+        }
+      });
+      document.getElementById("quickReplyContent").value = getQuickReplyTemplate(tabIndex, currentUsername, currentDownloadUrl);
+    }
+
+    function toggleShowKey() {
+      const input = document.getElementById("apiKeyInput");
+      const icon = document.getElementById("eyeIcon");
+      if (input.type === "password") {
+        input.type = "text";
+        icon.className = "fa-solid fa-eye-slash";
+      } else {
+        input.type = "password";
+        icon.className = "fa-solid fa-eye";
+      }
+    }
+
+    function showStatus(msg, isError = false) {
+      const el = document.getElementById("apiStatusAlert");
+      el.classList.remove("hidden", "text-emerald-400", "text-rose-400");
+      el.classList.add(isError ? "text-rose-400" : "text-emerald-400");
+      el.innerHTML = `<i class="fa-solid ${isError ? 'fa-triangle-exclamation' : 'fa-circle-check'} mr-1"></i> ${msg}`;
+    }
+
+    function toggleMode() {
+      const isMock = document.getElementById("mockModeToggle").checked;
+      if (isMock) {
+        showStatus("Đang bật Chế độ Local Free (Mock Mode) - Kích hoạt & test thoải mái không tốn lượt!");
+      } else {
+        showStatus("Đã chuyển sang Chế độ Production API - Sẽ gọi trực tiếp lên Server JayDev với X-API-Key.");
+      }
+      syncAllData();
+    }
+
+    // Gọi API 1 (/api/v1/credits/check) & API 3 (/api/v1/dns/dashboard-stats)
+    async function syncAllData() {
+      const isMock = document.getElementById("mockModeToggle").checked;
+      const apiKey = document.getElementById("apiKeyInput").value.trim();
+      const baseUrl = document.getElementById("baseUrlSelect").value;
+
+      if (apiKey) localStorage.setItem("JAYDEV_API_KEY", apiKey);
+
+      if (isMock) {
+        renderDashboard(mockState);
+        return;
+      }
+
+      if (!apiKey) {
+        showStatus("Vui lòng nhập X-API-Key hoặc bật 'Chế độ Local Free (Mock)' ở góc phải!", true);
+        return;
+      }
+
+      try {
+        showStatus("Đang đồng bộ dữ liệu từ máy chủ JayDev...");
+        const headers = {
+          "X-API-Key": apiKey,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        };
+
+        const [creditsRes, statsRes] = await Promise.all([
+          fetch(`${baseUrl}/api/v1/credits/check`, { headers }),
+          fetch(`${baseUrl}/api/v1/dns/dashboard-stats`, { headers })
+        ]);
+
+        const creditsData = await creditsRes.json();
+        const statsData = await statsRes.json();
+
+        if (!creditsData.success) throw new Error(creditsData.message || "Lỗi xác thực API Key");
+
+        const mergedState = {
+          credits: creditsData.credits ?? statsData.summary?.remaining_credits ?? 0,
+          total_purchased: statsData.summary?.total_purchased ?? 0,
+          total_used: statsData.summary?.total_used ?? 0,
+          active_clients: statsData.summary?.active_clients ?? creditsData.user?.active_customers ?? 0,
+          expired_clients: statsData.summary?.expired_clients ?? 0,
+          user: creditsData.user || { name: "CTV JayDev" },
+          recent_clients: statsData.recent_clients || []
+        };
+
+        renderDashboard(mergedState);
+        showStatus(`Kết nối API thành công! Xin chào ${mergedState.user.name}`);
+      } catch (err) {
+        showStatus(`Không thể kết nối trực tiếp (${err.message}). Đã tự động hiển thị dữ liệu Local!`, true);
+        renderDashboard(mockState);
+      }
+    }
+
+    function renderDashboard(state) {
+      document.getElementById("ctvNameDisplay").textContent = `${state.user.name} (${state.user.status || 'ACTIVE'})`;
+      document.getElementById("navCredits").textContent = state.credits;
+      document.getElementById("navTotalPurchased").textContent = state.total_purchased;
+      document.getElementById("navActiveClients").textContent = state.active_clients;
+
+      document.getElementById("statTotalPurchased").textContent = state.total_purchased;
+      document.getElementById("statRemaining").textContent = state.credits;
+      document.getElementById("statUsed").textContent = state.total_used;
+      document.getElementById("statActive").textContent = state.active_clients;
+      document.getElementById("statExpired").textContent = state.expired_clients;
+
+      const tbody = document.getElementById("clientsTableBody");
+      tbody.innerHTML = state.recent_clients.map(client => `
+        <tr class="hover:bg-zinc-900/60 transition">
+          <td class="py-3 px-4 font-mono text-zinc-400">#${client.id}</td>
+          <td class="py-3 px-4 font-bold text-white">@${client.locket_username}</td>
+          <td class="py-3 px-4 text-yellow-400 font-medium">${client.package_name}</td>
+          <td class="py-3 px-4 text-zinc-400">${client.created_at}</td>
+          <td class="py-3 px-4">
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${client.is_dns_active ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-700 text-zinc-300'}">
+              ${client.is_dns_active ? 'DNS Đang Bật' : 'Tắt'}
+            </span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-500/20 text-blue-400">${client.status}</span>
+          </td>
+          <td class="py-3 px-4 text-right">
+            <button onclick="fillQuickReplyForUser('${client.locket_username}')" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-2.5 py-1 rounded-lg transition">
+              <i class="fa-solid fa-paper-plane mr-1 text-yellow-400"></i> Lấy Tin Nhắn
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function fillQuickReplyForUser(username) {
+      currentUsername = username;
+      currentDownloadUrl = `https://180.93.61.146/locket.mobileconfig?token=${encodeURIComponent(username)}`;
+      selectQuickReply(currentTab);
+      showStatus(`Đã nạp thông tin của @${username} vào khung Tin Nhắn Nhanh!`);
+    }
+
+    // Gọi API 2: POST /api/v1/dns/export-dns
+    async function activateClient() {
+      const username = document.getElementById("clientUsername").value.trim();
+      if (!username) {
+        alert("Vui lòng nhập Username Locket hoặc UID của khách hàng!");
+        return;
+      }
+
+      const payload = {
+        username: username,
+        package_name: document.getElementById("packageName").value,
+        days: parseInt(document.getElementById("packageDays").value) || 9999,
+        features: {
+          locket_gold: document.getElementById("feat_locket").checked,
+          spotify_premium: document.getElementById("feat_spotify").checked,
+          adblock_youtube: document.getElementById("feat_youtube").checked,
+          photobooth_frames: document.getElementById("feat_photobooth").checked,
+          video_60s: document.getElementById("feat_video60s").checked
+        }
+      };
+
+      const isMock = document.getElementById("mockModeToggle").checked;
+      const apiKey = document.getElementById("apiKeyInput").value.trim();
+      const baseUrl = document.getElementById("baseUrlSelect").value;
+
+      if (isMock) {
+        const randomCode = `JAY-${Math.floor(10000 + Math.random() * 90000)}-VIP`;
+        const dlUrl = `https://180.93.61.146/locket.mobileconfig?token=${encodeURIComponent(username)}`;
+        
+        mockState.recent_clients.unshift({
+          id: Math.floor(1083 + Math.random() * 900),
+          locket_username: username,
+          package_name: payload.package_name,
+          created_at: new Date().toISOString().slice(0, 19).replace("T", " "),
+          is_dns_active: true,
+          status: "ACTIVE"
+        });
+        mockState.active_clients += 1;
+        mockState.total_used += 1;
+
+        handleActivationSuccess({
+          username: username,
+          activation_code: randomCode,
+          download_url: dlUrl,
+          expires_at: payload.days >= 9999 ? "Vĩnh viễn" : `${payload.days} ngày`,
+          remaining_credits: mockState.credits
+        });
+        renderDashboard(mockState);
+        return;
+      }
+
+      try {
+        showStatus(`Đang gửi lệnh kích hoạt cho @${username}...`);
+        const res = await fetch(`${baseUrl}/api/v1/dns/export-dns`, {
+          method: "POST",
+          headers: {
+            "X-API-Key": apiKey,
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || "Kích hoạt thất bại");
+
+        handleActivationSuccess(data.data);
+        syncAllData();
+      } catch (err) {
+        showStatus(`Lỗi khi gọi API kích hoạt: ${err.message}`, true);
+      }
+    }
+
+    function handleActivationSuccess(data) {
+      currentUsername = data.username;
+      currentDownloadUrl = data.download_url;
+
+      document.getElementById("activationResultBox").classList.remove("hidden");
+      document.getElementById("resCode").textContent = data.activation_code;
+      document.getElementById("resUser").textContent = `@${data.username}`;
+      document.getElementById("resExp").textContent = data.expires_at;
+      const linkEl = document.getElementById("resLink");
+      linkEl.textContent = data.download_url;
+      linkEl.href = data.download_url;
+
+      selectQuickReply(1);
+      showStatus(`Đã kích hoạt thành công cho @${data.username} và tạo sẵn tin nhắn hướng dẫn!`);
+    }
+
+    function copyDnsLink() {
+      navigator.clipboard.writeText(currentDownloadUrl);
+      showStatus("Đã copy link tải cấu hình DNS vào bộ nhớ tạm!");
+    }
+
+    function copyQuickMessage() {
+      const content = document.getElementById("quickReplyContent").value;
+      navigator.clipboard.writeText(content);
+      const statusEl = document.getElementById("copyStatusText");
+      statusEl.textContent = "✅ Đã copy thành công! Bạn có thể dán (Ctrl+V) gửi khách ngay.";
+      statusEl.className = "text-xs text-emerald-400 font-semibold";
+      setTimeout(() => {
+        statusEl.textContent = "Sẵn sàng copy gửi qua Zalo / Messenger / Telegram";
+        statusEl.className = "text-xs text-zinc-400";
+      }, 3500);
+    }
+
+    // Tạo file .mobileconfig trực tiếp tại Local để cài thử nghiệm
+    function downloadLocalMobileConfig() {
+      const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>PayloadContent</key>
+  <array>
+    <dict>
+      <key>DNSSettings</key>
+      <dict>
+        <key>DNSProtocol</key>
+        <string>HTTPS</string>
+        <key>ServerURL</key>
+        <string>https://locket.jayteam.click/dns-query?user=${encodeURIComponent(currentUsername)}</string>
+      </dict>
+      <key>PayloadDescription</key>
+      <string>Cấu hình kích hoạt Locket Gold, Spotify VIP &amp; Chặn Quảng Cáo YouTube</string>
+      <key>PayloadDisplayName</key>
+      <string>JayDev VIP DNS (@${currentUsername})</string>
+      <key>PayloadIdentifier</key>
+      <string>com.jaydev.dns.${currentUsername}</string>
+      <key>PayloadType</key>
+      <string>com.apple.dnsSettings.managed</string>
+      <key>PayloadUUID</key>
+      <string>88392011-ABCD-1234-EF00-${Date.now().toString().slice(-12)}</string>
+      <key>PayloadVersion</key>
+      <integer>1</integer>
+    </dict>
+  </array>
+  <key>PayloadDisplayName</key>
+  <string>Locket Gold VIP - @${currentUsername} (Team JayDev)</string>
+  <key>PayloadIdentifier</key>
+  <string>com.jaydev.profile.${currentUsername}</string>
+  <key>PayloadOrganization</key>
+  <string>JayDev Cloud Engine</string>
+  <key>PayloadRemovalDisallowed</key>
+  <false/>
+  <key>PayloadType</key>
+  <string>Configuration</string>
+  <key>PayloadUUID</key>
+  <string>11223344-5566-7788-99AA-${Date.now().toString().slice(-12)}</string>
+  <key>PayloadVersion</key>
+  <integer>1</integer>
+</dict>
+</plist>`;
+
+      const blob = new Blob([xmlContent], { type: "application/x-apple-aspen-config" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `locket_${currentUsername}.mobileconfig`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Khởi tạo khi mở trang
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedKey = localStorage.getItem("JAYDEV_API_KEY");
+      if (savedKey) document.getElementById("apiKeyInput").value = savedKey;
+      selectQuickReply(1);
+      renderDashboard(mockState);
+    });
+  </script>
+</body>
+</html>
