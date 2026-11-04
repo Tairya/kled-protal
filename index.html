@@ -57,7 +57,7 @@
   <!-- MAIN CONTENT -->
   <main class="max-w-7xl mx-auto px-4 py-6 w-full space-y-6">
 
-    <!-- CẤU HÌNH CỐ ĐỊNH (ẨN HOẶC HIỂN THỊ CỐ ĐỊNH) -->
+    <!-- CẤU HÌNH CỐ ĐỊNH -->
     <section class="card-dark p-5 card-gold-border">
       <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
         <div class="md:col-span-5">
@@ -94,7 +94,7 @@
           <h2 class="text-base font-extrabold text-yellow-400 flex items-center gap-2">
             <i class="fa-solid fa-bolt"></i> KÍCH HOẠT DỊCH VỤ & TẠO DNS
           </h2>
-          <p class="text-xs text-zinc-400 mt-0.5">Endpoint: <code class="text-zinc-300">POST /api/v1/dns/export</code>[cite: 1]</p>
+          <p class="text-xs text-zinc-400 mt-0.5">Endpoint: <code class="text-zinc-300">POST /api/v1/dns/export</code></p>
         </div>
 
         <div class="space-y-4">
@@ -211,6 +211,7 @@
     async function syncAllData() {
       try {
         showStatus("Đang đồng bộ số lượt từ server JayDev...");
+        // Sửa endpoint chuẩn theo lệnh cURL mới: /api/v1/credits
         const res = await fetch(`${BASE_URL}/api/v1/credits`, {
           headers: {
             "X-API-Key": API_KEY,
@@ -219,13 +220,11 @@
         });
         const data = await res.json();
         
-        // Hiển thị số credits thực tế trả về từ API
         document.getElementById("navCredits").textContent = data.credits ?? data.remaining ?? "50";
         document.getElementById("navTotalPurchased").textContent = data.total_purchased ?? "50";
         document.getElementById("navActiveClients").textContent = data.active_customers ?? "0";
         showStatus("Đồng bộ thành công dữ liệu tài khoản!");
       } catch (err) {
-        // Fallback hiển thị mặc định nếu CORS chặn trực tiếp trình duyệt
         document.getElementById("navCredits").textContent = "50";
         document.getElementById("navTotalPurchased").textContent = "50";
         document.getElementById("navActiveClients").textContent = "0";
@@ -245,6 +244,7 @@
 
       try {
         showStatus(`Đang gửi yêu cầu kích hoạt cho @${username}...`);
+        // Sửa endpoint chuẩn theo lệnh cURL mới: /api/v1/dns/export
         const res = await fetch(`${BASE_URL}/api/v1/dns/export`, {
           method: "POST",
           headers: {
@@ -252,7 +252,7 @@
             "Content-Type": "application/json",
             "Accept": "application/json"
           },
-          body: JSON.stringify({ locket_username: username })[cite: 1]
+          body: JSON.stringify({ locket_username: username })
         });
         const data = await res.json();
         
@@ -265,7 +265,6 @@
         showStatus(`Kích hoạt thành công cho @${username}!`);
         syncAllData();
       } catch (err) {
-        // Fallback xử lý offline nếu trình duyệt bị chặn CORS
         document.getElementById("activationResultBox").classList.remove("hidden");
         document.getElementById("resUser").textContent = `@${username}`;
         document.getElementById("resLink").textContent = currentDownloadUrl;
