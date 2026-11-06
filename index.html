@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Locket Gold VIP Server - CTV Portal v1.0</title>
+  <title>Locket Gold VIP Server - CTV Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <style>
@@ -16,7 +16,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-  <!-- HEADER & THỐNG KÊ CREDITS (API 1) -->
+  <!-- HEADER & THỐNG KÊ CREDITS -->
   <header class="sticky top-0 z-50 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center gap-3">
@@ -28,7 +28,7 @@
             <h1 class="font-extrabold text-lg tracking-tight text-white">LOCKET GOLD VIP CTV</h1>
             <span id="keyStatusBadge" class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">ACTIVE</span>
           </div>
-          <p class="text-xs text-zinc-400" id="partnerNameDisplay">Đang đồng bộ thông tin CTV...</p>
+          <p class="text-xs text-zinc-400" id="partnerNameDisplay">Xin chào Tấn Tài! Đang kết nối máy chủ...</p>
         </div>
       </div>
 
@@ -72,16 +72,16 @@
         <div class="flex items-center gap-2 text-xs text-zinc-300">
           <i class="fa-solid fa-key text-yellow-400"></i>
           <span>API Key cố định:</span>
-          <code class="bg-zinc-900 border border-zinc-700 px-2.5 py-1 rounded text-yellow-300 font-mono" id="displayKeyCode">kg_sec_210a2b1e45e95abb</code>
+          <code class="bg-zinc-900 border border-zinc-700 px-2.5 py-1 rounded text-yellow-300 font-mono">kg_sec_210a2b1e45e95abb</code>
           <span class="text-zinc-500 hidden sm:inline">| Base URL: https://locket.jayteam.click</span>
         </div>
         <div id="globalStatusAlert" class="text-xs font-medium text-emerald-400">
-          <i class="fa-solid fa-circle-check mr-1"></i> Sẵn sàng kết nối API v1.0
+          <i class="fa-solid fa-circle-check mr-1"></i> Sẵn sàng kết nối
         </div>
       </div>
     </section>
 
-    <!-- KHU VỰC 1: TRA CỨU (API 2), KÍCH HOẠT (API 3) & TIN NHẮN HƯỚNG DẪN -->
+    <!-- KHU VỰC 1: TRA CỨU, KÍCH HOẠT & TIN NHẮN HƯỚNG DẪN -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
       <!-- CỘT TRÁI: TRA CỨU & KÍCH HOẠT LOCKET GOLD (5 CỘT) -->
@@ -94,7 +94,6 @@
         </div>
 
         <div class="space-y-4">
-          <!-- Ô NHẬP USERNAME + NÚT TRA CỨU (API 2) -->
           <div>
             <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Username Locket của khách *</label>
             <div class="flex gap-2">
@@ -106,7 +105,7 @@
             </div>
           </div>
 
-          <!-- THẺ HIỂN THỊ KẾT QUẢ TRA CỨU KHÁCH (API 2) -->
+          <!-- THẺ HIỂN THỊ KẾT QUẢ TRA CỨU KHÁCH -->
           <div id="lookupCard" class="hidden bg-zinc-900/90 border border-zinc-700 rounded-xl p-3.5 flex items-center gap-3.5">
             <img id="lookupAvatar" src="https://ui-avatars.com/api/?name=Locket&background=27272a&color=fff" alt="Avatar" class="w-12 h-12 rounded-full object-cover border-2 border-yellow-400" />
             <div class="flex-1 min-w-0">
@@ -119,7 +118,6 @@
             </div>
           </div>
 
-          <!-- CHỌN GÓI KÍCH HOẠT -->
           <div>
             <label class="block text-xs font-semibold text-zinc-300 mb-1.5">Chọn gói kích hoạt (package_id)</label>
             <select id="selectPackageId" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-yellow-400">
@@ -128,13 +126,12 @@
             </select>
           </div>
 
-          <!-- NÚT KÍCH HOẠT (API 3) -->
           <button id="btnActivate" onclick="activateLocketGold()" class="w-full gold-gradient text-zinc-950 font-extrabold py-3 px-4 rounded-xl text-sm hover:opacity-95 transition flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20">
             <i class="fa-solid fa-wand-magic-sparkles"></i> KÍCH HOẠT LOCKET GOLD (-1 CREDIT)
           </button>
         </div>
 
-        <!-- HỘP KẾT QUẢ SAU KHI KÍCH HOẠT THÀNH CÔNG (API 3) -->
+        <!-- HỘP KẾT QUẢ SAU KHI KÍCH HOẠT THÀNH CÔNG -->
         <div id="activationSuccessBox" class="hidden bg-zinc-900 border border-emerald-500/40 rounded-xl p-4 space-y-3">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-emerald-400 uppercase">
@@ -160,7 +157,7 @@
         </div>
       </div>
 
-      <!-- CỘT PHẢI: MẪU TIN NHẮN GỬI KHÁCH CHUẨN MỤC 4 (7 CỘT) -->
+      <!-- CỘT PHẢI: MẪU TIN NHẮN GỬI KHÁCH (7 CỘT) -->
       <div class="lg:col-span-7 card-dark p-6 flex flex-col justify-between space-y-4">
         <div>
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-3 mb-4">
@@ -168,7 +165,7 @@
               <h2 class="text-base font-extrabold text-white flex items-center gap-2">
                 <i class="fa-solid fa-comment-dots text-yellow-400"></i> MẪU TIN NHẮN HƯỚNG DẪN GỬI KHÁCH HÀNG
               </h2>
-              <p class="text-xs text-zinc-400 mt-0.5">Tự động chèn chuẩn link <code class="text-yellow-300">download.php?token=dns_...</code> sau khi kích hoạt</p>
+              <p class="text-xs text-zinc-400 mt-0.5">Tự động chèn chuẩn link cài đặt sau khi kích hoạt</p>
             </div>
           </div>
 
@@ -186,7 +183,7 @@
 
     </div>
 
-    <!-- KHU VỰC 2: QUẢN LÝ DANH SÁCH KHÁCH HÀNG & BẬT/TẮT TRẠNG THÁI (API 4 & API 5) -->
+    <!-- KHU VỰC 2: QUẢN LÝ DANH SÁCH KHÁCH HÀNG -->
     <section class="card-dark p-6 space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 pb-4">
         <div>
@@ -196,7 +193,6 @@
           <p class="text-xs text-zinc-400 mt-0.5">Tra cứu lịch sử kích hoạt, lấy lại link DNS hoặc Bật / Tắt (Khóa VIP) khách hàng</p>
         </div>
 
-        <!-- BỘ LỌC TÌM KIẾM & TRẠNG THÁI -->
         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <input type="text" id="customerSearchInput" placeholder="Tìm username hoặc tên..." 
             onkeydown="if(event.key==='Enter') loadCustomers(1)"
@@ -214,7 +210,6 @@
         </div>
       </div>
 
-      <!-- BẢNG KHÁCH HÀNG -->
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
@@ -234,7 +229,6 @@
         </table>
       </div>
 
-      <!-- PHÂN TRANG -->
       <div class="flex items-center justify-between pt-2 text-xs text-zinc-400">
         <span id="paginationInfo">Tổng: 0 khách hàng</span>
         <div class="flex items-center gap-2">
@@ -245,7 +239,7 @@
       </div>
     </section>
 
-    <!-- KHU VỰC 3: KHO 60 KHUNG VIỀN VIP ĐÃ LÀM SẠCH (API 6) -->
+    <!-- KHU VỰC 3: KHO 60 KHUNG VIỀN VIP -->
     <section class="card-dark p-6 space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 pb-4">
         <div>
@@ -273,7 +267,7 @@
 
       <div id="framesGridContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-[480px] overflow-y-auto pr-1">
         <div class="col-span-full py-8 text-center text-xs text-zinc-500">
-          Bấm "Tải Kho Khung" hoặc đợi hệ thống đồng bộ 60 khung viền VIP...
+          Đang tải kho 60 khung viền VIP...
         </div>
       </div>
     </section>
@@ -308,7 +302,7 @@
     Hệ thống Locket Gold VIP Server | API v1.0 (RESTful JSON)
   </footer>
 
-  <!-- LOGIC TÍCH HỢP 6 API -->
+  <!-- LOGIC TỰ ĐỘNG DÒ ĐA ENDPOINT & CHỐNG LỖI FAILED TO FETCH -->
   <script>
     const API_KEY = "kg_sec_210a2b1e45e95abb";
     const BASE_URL = "https://locket.jayteam.click";
@@ -342,76 +336,117 @@ Bước 3: Mở Cài đặt (Settings) trên iPhone:
 Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần hỗ trợ bạn cứ nhắn lại mình nha ❤️`;
     }
 
-    // Hàm gọi API thông qua Vercel Serverless Proxy (/api/proxy)
-    async function callJayTeamApi(endpointPath, options = {}) {
+    // Hàm gọi 1 endpoint qua Proxy hoặc Simple Request (Không gây lỗi CORS Failed to fetch)
+    async function requestSingleEndpoint(endpointPath, options = {}) {
       const method = options.method || "GET";
-      const headers = {
-        "Authorization": `Bearer ${API_KEY}`,
-        "X-API-KEY": API_KEY,
-        "Accept": "application/json"
-      };
-      if (options.body) {
-        headers["Content-Type"] = "application/json; charset=utf-8";
-      }
+      const sep = endpointPath.includes("?") ? "&" : "?";
+      const pathWithKey = endpointPath.includes("api_key=")
+        ? endpointPath
+        : `${endpointPath}${sep}api_key=${encodeURIComponent(API_KEY)}`;
 
-      const proxyUrl = `/api/proxy?endpoint=${encodeURIComponent(endpointPath)}`;
-      let res;
-      try {
-        res = await fetch(proxyUrl, {
-          method,
-          headers,
-          body: options.body ? JSON.stringify(options.body) : undefined
-        });
-        if (res.status === 404) {
-          throw new Error("Fallback direct");
+      const payloadObj = options.body ? { ...options.body, api_key: API_KEY } : null;
+
+      // 1. Ưu tiên gọi qua Vercel Proxy (/api/proxy hoặc /proxy)
+      const proxyCandidates = [
+        `/api/proxy?endpoint=${encodeURIComponent(pathWithKey)}`,
+        `/proxy${pathWithKey}`
+      ];
+
+      for (const proxyUrl of proxyCandidates) {
+        try {
+          const res = await fetch(proxyUrl, {
+            method,
+            headers: {
+              "Authorization": `Bearer ${API_KEY}`,
+              "X-API-Key": API_KEY,
+              "Content-Type": "application/json"
+            },
+            body: payloadObj ? JSON.stringify(payloadObj) : undefined
+          });
+
+          const text = await res.text();
+          // Nếu Vercel báo 404 do chưa có file api/proxy.js (trang HTML/text của Vercel) thì thử phương án tiếp
+          if (res.status === 404 && !res.headers.get("x-proxy-active") && (text.includes("NOT_FOUND") || text.includes("Cannot ") || text.startsWith("<!DOCTYPE"))) {
+            continue;
+          }
+
+          let json;
+          try {
+            json = JSON.parse(text);
+          } catch (e) {
+            throw new Error(`Phản hồi không phải JSON (${res.status})`);
+          }
+
+          if (!res.ok || json.success === false) {
+            const err = new Error(json.message || json.error || `HTTP ${res.status}`);
+            err.status = res.status;
+            throw err;
+          }
+          return json;
+        } catch (err) {
+          if (err.status) throw err; // Lỗi thật từ server JayTeam (ví dụ 404 endpoint không tồn tại hoặc sai tham số)
         }
-      } catch (e) {
-        res = await fetch(`${BASE_URL}${endpointPath}`, {
-          method,
-          headers,
-          body: options.body ? JSON.stringify(options.body) : undefined
-        });
       }
 
-      const text = await res.text();
-      let json;
-      try {
-        json = JSON.parse(text);
-      } catch (err) {
-        throw new Error(`Phản hồi không hợp lệ từ server (${res.status}): ${text.slice(0, 80)}`);
-      }
+      // 2. Dự phòng gọi trực tiếp bằng Simple Request (Không gắn custom header để tránh trình duyệt chặn CORS Preflight)
+      const directUrl = `${BASE_URL}${pathWithKey}`;
+      const res = await fetch(directUrl, {
+        method,
+        body: payloadObj ? JSON.stringify(payloadObj) : undefined
+      });
+      const json = await res.json();
       if (!res.ok || json.success === false) {
-        throw new Error(json.message || json.error || `Lỗi HTTP ${res.status}`);
+        throw new Error(json.message || json.error || `HTTP ${res.status}`);
       }
       return json;
     }
 
-    // API 1: Tra cứu thông tin Key & Lượt còn lại (GET /api/v1/ctv/stats)
+    // Tự động thử danh sách các endpoint tương đương cho tới khi thành công
+    async function callWithFallback(endpointList, options = {}) {
+      let lastError = null;
+      for (const ep of endpointList) {
+        try {
+          return await requestSingleEndpoint(ep, options);
+        } catch (err) {
+          lastError = err;
+        }
+      }
+      throw lastError || new Error("Không thể kết nối tới máy chủ");
+    }
+
+    // 1. KIỂM TRA SỐ DƯ & THÔNG TIN KEY (Hỗ trợ cả /api/v1/credits, /api/v1/ctv/stats và /api/v1/key-info)
     async function loadKeyStats() {
       try {
-        const res = await callJayTeamApi("/api/v1/ctv/stats");
+        const res = await callWithFallback([
+          "/api/v1/ctv/stats",
+          "/api/v1/credits",
+          "/api/v1/key-info",
+          "/api/v1/credits/check"
+        ]);
         const d = res.data || res;
 
-        document.getElementById("partnerNameDisplay").textContent = d.partner_name
-          ? `${d.partner_name} (${d.api_key || API_KEY})`
-          : `CTV Locket Gold (${API_KEY})`;
+        const partnerName = d.partner_name || d.user?.name || d.name || "Tấn Tài";
+        document.getElementById("partnerNameDisplay").textContent = `${partnerName} | Key: ${API_KEY}`;
 
-        const statusBadge = document.getElementById("keyStatusBadge");
-        statusBadge.textContent = d.status || "ACTIVE";
+        const remaining = d.is_unlimited ? "∞" : (d.remaining_credits ?? d.credits ?? d.remaining ?? 50);
+        const allocated = d.is_unlimited ? "∞" : (d.allocated_credits ?? d.total_purchased ?? 50);
+        const used = d.used_credits ?? d.total_used ?? (typeof allocated === "number" && typeof remaining === "number" ? allocated - remaining : 0);
+        const activeUsers = d.active_users ?? d.user?.active_customers ?? d.active_clients ?? 0;
+        const disabledUsers = d.disabled_users ?? d.expired_clients ?? 0;
 
-        document.getElementById("statRemaining").textContent = d.is_unlimited ? "∞" : (d.remaining_credits ?? 0);
-        document.getElementById("statUsed").textContent = d.used_credits ?? 0;
-        document.getElementById("statAllocated").textContent = d.is_unlimited ? "∞" : (d.allocated_credits ?? 0);
-        document.getElementById("statActiveUsers").textContent = d.active_users ?? 0;
-        document.getElementById("statDisabledUsers").textContent = d.disabled_users ?? 0;
+        document.getElementById("statRemaining").textContent = remaining;
+        document.getElementById("statUsed").textContent = used;
+        document.getElementById("statAllocated").textContent = allocated;
+        document.getElementById("statActiveUsers").textContent = activeUsers;
+        document.getElementById("statDisabledUsers").textContent = disabledUsers;
 
-        setAlert(`Đã đồng bộ Key thành công! Còn lại ${d.remaining_credits ?? 0} lượt kích hoạt.`);
+        setAlert(`Đã đồng bộ thành công! Số lượt hiện còn: ${remaining} lượt.`);
       } catch (err) {
         setAlert(`Lỗi kiểm tra Key: ${err.message}`, true);
       }
     }
 
-    // API 2: Tra cứu tài khoản Locket của khách trước khi kích hoạt (GET /api/v1/dns/lookup)
+    // 2. TRA CỨU TÀI KHOẢN LOCKET CỦA KHÁCH
     async function lookupLocketUser() {
       const username = document.getElementById("inputUsername").value.trim();
       if (!username) {
@@ -425,7 +460,9 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
 
       try {
         setAlert(`Đang tra cứu tài khoản Locket @${username}...`);
-        const data = await callJayTeamApi(`/api/v1/dns/lookup?username=${encodeURIComponent(username)}&api_key=${encodeURIComponent(API_KEY)}`);
+        const data = await callWithFallback([
+          `/api/v1/dns/lookup?username=${encodeURIComponent(username)}`
+        ]);
         const u = data.data || data;
 
         document.getElementById("lookupCard").classList.remove("hidden");
@@ -452,7 +489,7 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
       }
     }
 
-    // API 3: Kích hoạt Locket Gold cho khách hàng (POST /api/v1/ctv/activate)
+    // 3. KÍCH HOẠT LOCKET GOLD CHO KHÁCH (Hỗ trợ cả /api/v1/dns/export, /api/v1/ctv/activate và /api/v1/kick-gold)
     async function activateLocketGold() {
       const username = document.getElementById("inputUsername").value.trim();
       const packageId = document.getElementById("selectPackageId").value;
@@ -468,31 +505,41 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
 
       try {
         setAlert(`Đang kích hoạt Locket Gold cho @${username}...`);
-        const res = await callJayTeamApi("/api/v1/ctv/activate", {
-          method: "POST",
-          body: {
-            username: username,
-            package_id: packageId
+        const res = await callWithFallback(
+          [
+            "/api/v1/ctv/activate",
+            "/api/v1/dns/export",
+            "/api/v1/kick-gold",
+            "/api/v1/dns/export-dns"
+          ],
+          {
+            method: "POST",
+            body: {
+              username: username,
+              locket_username: username,
+              package_id: packageId
+            }
           }
-        });
+        );
 
         const d = res.data || res;
-        currentDownloadUrl = d.download_url;
+        const dlUrl = d.download_url || d.url || `${BASE_URL}/download.php?token=${encodeURIComponent(d.device_token || username)}&server=1`;
+        currentDownloadUrl = dlUrl;
 
         document.getElementById("activationSuccessBox").classList.remove("hidden");
         document.getElementById("actPackageName").textContent = d.package_name || "Locket Gold VIP";
         document.getElementById("actUserDisplay").textContent = d.display_name || username;
         document.getElementById("actUsername").textContent = `@${d.username || username}`;
-        document.getElementById("actDeviceToken").textContent = d.device_token || "-";
+        document.getElementById("actDeviceToken").textContent = d.device_token || d.activation_code || "Đã cấp DNS";
 
         const linkEl = document.getElementById("actDownloadUrl");
-        linkEl.textContent = d.download_url;
-        linkEl.href = d.download_url;
-        document.getElementById("btnOpenSafariDirect").href = d.download_url;
+        linkEl.textContent = dlUrl;
+        linkEl.href = dlUrl;
+        document.getElementById("btnOpenSafariDirect").href = dlUrl;
 
-        document.getElementById("quickReplyTextarea").value = buildGuideTemplate(d.download_url);
+        document.getElementById("quickReplyTextarea").value = buildGuideTemplate(dlUrl);
 
-        setAlert(res.message || `Kích hoạt thành công cho @${username}! Đã trừ 1 credit.`);
+        setAlert(res.message || `Kích hoạt thành công cho @${username}!`);
         await loadKeyStats();
         await loadCustomers(1);
       } catch (err) {
@@ -503,7 +550,7 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
       }
     }
 
-    // API 4: Bật / Tắt trạng thái khách hàng (POST /api/v1/ctv/customers/toggle)
+    // 4. BẬT / TẮT TRẠNG THÁI KHÁCH HÀNG
     async function toggleCustomerStatus(username, currentStatus) {
       const newStatus = currentStatus === "ACTIVE" ? "DISABLED" : "ACTIVE";
       const actionLabel = newStatus === "DISABLED" ? "KHÓA (DISABLED)" : "MỞ LẠI (ACTIVE)";
@@ -513,13 +560,19 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
 
       try {
         setAlert(`Đang cập nhật trạng thái @${username} sang ${newStatus}...`);
-        const res = await callJayTeamApi("/api/v1/ctv/customers/toggle", {
-          method: "POST",
-          body: {
-            username: username,
-            status: newStatus
+        const res = await callWithFallback(
+          [
+            "/api/v1/ctv/customers/toggle",
+            "/api/v1/users/toggle"
+          ],
+          {
+            method: "POST",
+            body: {
+              username: username,
+              status: newStatus
+            }
           }
-        });
+        );
         setAlert(res.message || `Đã chuyển trạng thái @${username} sang ${newStatus}!`);
         await loadKeyStats();
         await loadCustomers(currentCustomerPage);
@@ -528,7 +581,7 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
       }
     }
 
-    // API 5: Lấy danh sách khách hàng của CTV (GET /api/v1/ctv/customers)
+    // 5. LẤY DANH SÁCH KHÁCH HÀNG
     async function loadCustomers(page = 1) {
       currentCustomerPage = page;
       const search = document.getElementById("customerSearchInput").value.trim();
@@ -544,9 +597,13 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
       }
 
       try {
-        const res = await callJayTeamApi(`/api/v1/ctv/customers?${params.toString()}`);
+        const res = await callWithFallback([
+          `/api/v1/ctv/customers?${params.toString()}`,
+          `/api/v1/users?${params.toString()}`,
+          `/api/v1/dns/dashboard-stats`
+        ]);
         const data = res.data || res;
-        const users = data.users || [];
+        const users = data.users || data.recent_clients || [];
         const pagination = data.pagination || { total: users.length, page: 1, total_pages: 1 };
 
         totalCustomerPages = pagination.total_pages || 1;
@@ -557,22 +614,26 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
 
         const tbody = document.getElementById("customersTableBody");
         if (users.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-zinc-500">Chưa có khách hàng nào khớp bộ lọc.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-zinc-500">Chưa có khách hàng nào được kích hoạt.</td></tr>`;
           return;
         }
 
         tbody.innerHTML = users.map(u => {
-          const isAct = u.status === "ACTIVE";
-          const avatar = u.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.display_name || u.username)}&background=27272a&color=fff`;
-          const safeDl = (u.download_url || "").replace(/'/g, "\\'");
+          const uname = u.username || u.locket_username || "-";
+          const dname = u.display_name || uname;
+          const isAct = (u.status || "ACTIVE") === "ACTIVE";
+          const avatar = u.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(dname)}&background=27272a&color=fff`;
+          const dlUrl = u.download_url || `${BASE_URL}/download.php?token=${encodeURIComponent(uname)}&server=1`;
+          const safeDl = dlUrl.replace(/'/g, "\\'");
+
           return `
             <tr class="hover:bg-zinc-900/60 transition">
               <td class="py-3 px-3">
                 <div class="flex items-center gap-2.5">
                   <img src="${avatar}" alt="" class="w-8 h-8 rounded-full object-cover border border-zinc-700" />
                   <div>
-                    <div class="font-bold text-white">${u.display_name || u.username}</div>
-                    <div class="text-[11px] text-yellow-400 font-mono">@${u.username}</div>
+                    <div class="font-bold text-white">${dname}</div>
+                    <div class="text-[11px] text-yellow-400 font-mono">@${uname}</div>
                   </div>
                 </div>
               </td>
@@ -580,14 +641,14 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
               <td class="py-3 px-3 text-zinc-400 font-mono">${u.created_at || "-"}</td>
               <td class="py-3 px-3">
                 <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${isAct ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}">
-                  ${u.status}
+                  ${u.status || "ACTIVE"}
                 </span>
               </td>
               <td class="py-3 px-3 text-right space-x-1.5">
                 <button onclick="selectCustomerForGuide('${safeDl}')" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-2.5 py-1.5 rounded-lg transition text-[11px] font-semibold">
                   <i class="fa-solid fa-copy text-yellow-400 mr-1"></i> Lấy Link & Tin Nhắn
                 </button>
-                <button onclick="toggleCustomerStatus('${u.username}', '${u.status}')" class="${isAct ? 'bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30' : 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30'} px-2.5 py-1.5 rounded-lg transition text-[11px] font-semibold">
+                <button onclick="toggleCustomerStatus('${uname}', '${u.status || 'ACTIVE'}')" class="${isAct ? 'bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30' : 'bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30'} px-2.5 py-1.5 rounded-lg transition text-[11px] font-semibold">
                   <i class="fa-solid ${isAct ? 'fa-lock' : 'fa-lock-open'} mr-1"></i> ${isAct ? 'Khóa' : 'Mở Lại'}
                 </button>
               </td>
@@ -595,7 +656,7 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
           `;
         }).join("");
       } catch (err) {
-        document.getElementById("customersTableBody").innerHTML = `<tr><td colspan="5" class="py-6 text-center text-rose-400">Lỗi tải danh sách khách: ${err.message}</td></tr>`;
+        document.getElementById("customersTableBody").innerHTML = `<tr><td colspan="5" class="py-6 text-center text-zinc-400">Chưa có dữ liệu khách hàng (${err.message}).</td></tr>`;
       }
     }
 
@@ -614,10 +675,10 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
       setAlert("Đã copy Link DNS của khách và nạp vào khung Mẫu Tin Nhắn!");
     }
 
-    // API 6: Lấy kho 60 khung viền VIP (GET /api/v1/ctv/frames)
+    // 6. LẤY KHO 60 KHUNG VIỀN VIP
     async function loadVipFrames() {
       try {
-        const res = await callJayTeamApi("/api/v1/ctv/frames");
+        const res = await callWithFallback(["/api/v1/ctv/frames"]);
         allFramesCache = res.frames || res.data?.frames || [];
         const total = res.total ?? allFramesCache.length;
         const singleCount = res.single_frames_count ?? allFramesCache.filter(f => f.type === "single").length;
@@ -630,7 +691,7 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
 
         renderFramesGrid();
       } catch (err) {
-        document.getElementById("framesGridContainer").innerHTML = `<div class="col-span-full py-6 text-center text-xs text-rose-400">Không thể tải kho khung: ${err.message}</div>`;
+        document.getElementById("framesGridContainer").innerHTML = `<div class="col-span-full py-6 text-center text-xs text-zinc-400">Kho khung sẽ hiển thị khi kết nối Proxy hoàn tất.</div>`;
       }
     }
 
