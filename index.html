@@ -72,7 +72,7 @@
         <div class="flex items-center gap-2 text-xs text-zinc-300">
           <i class="fa-solid fa-key text-yellow-400"></i>
           <span>API Key cố định:</span>
-          <code class="bg-zinc-900 border border-zinc-700 px-2.5 py-1 rounded text-yellow-300 font-mono" id="displayKeyCode">kg_sec_b379d5078a2cf559</code>
+          <code class="bg-zinc-900 border border-zinc-700 px-2.5 py-1 rounded text-yellow-300 font-mono" id="displayKeyCode">kg_sec_210a2b1e45e95abb</code>
           <span class="text-zinc-500 hidden sm:inline">| Base URL: https://locket.jayteam.click</span>
         </div>
         <div id="globalStatusAlert" class="text-xs font-medium text-emerald-400">
@@ -278,6 +278,30 @@
       </div>
     </section>
 
+    <!-- KHU VỰC 4: TRUNG TÂM HỖ TRỢ AE TEAM JAYDEV (2 MÃ QR) -->
+    <section style="background: linear-gradient(135deg, #18181b 0%, #09090b 100%); padding: 28px; border-radius: 20px; border: 1px solid rgba(255, 215, 0, 0.25); max-width: 760px; margin: 28px auto;">
+      <div class="text-center mb-6">
+        <h3 class="text-xl font-extrabold text-yellow-400 mb-1.5">TRUNG TÂM HỖ TRỢ AE TEAM JAYDEV</h3>
+        <p class="text-xs text-zinc-400">Quét mã QR để kết nối trực tiếp với Admin & Nhóm Hỗ Trợ</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="bg-zinc-800/90 rounded-2xl p-5 text-center border border-zinc-700 flex flex-col items-center">
+          <div class="inline-block p-2.5 bg-white rounded-xl mb-3.5 shadow-md">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=https%3A%2F%2Fweb.facebook.com%2Fjaytran0522" width="160" height="160" class="block" alt="QR Facebook" />
+          </div>
+          <h4 class="text-base font-bold text-blue-400 mb-1">Facebook Admin Jay Trần</h4>
+          <a href="https://web.facebook.com/jaytran0522" target="_blank" class="mt-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">Nhắn Tin Facebook</a>
+        </div>
+        <div class="bg-zinc-800/90 rounded-2xl p-5 text-center border border-zinc-700 flex flex-col items-center">
+          <div class="inline-block p-2.5 bg-white rounded-xl mb-3.5 shadow-md">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=https%3A%2F%2Fwww.tiktok.com%2F%40itlamtruyenthong0" width="160" height="160" class="block" alt="QR TikTok" />
+          </div>
+          <h4 class="text-base font-bold text-rose-400 mb-1">TikTok @itlamtruyenthong0</h4>
+          <a href="https://www.tiktok.com/@itlamtruyenthong0" target="_blank" class="mt-2 bg-rose-600 hover:bg-rose-500 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">Truy Cập TikTok</a>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <footer class="border-t border-zinc-900 py-4 text-center text-xs text-zinc-500 mt-8">
@@ -286,7 +310,7 @@
 
   <!-- LOGIC TÍCH HỢP 6 API -->
   <script>
-    const API_KEY = "kg_sec_b379d5078a2cf559";
+    const API_KEY = "kg_sec_210a2b1e45e95abb";
     const BASE_URL = "https://locket.jayteam.click";
 
     let currentDownloadUrl = "https://locket.jayteam.click/download.php?token=dns_xxxxxxxxxxxx&server=1";
@@ -318,7 +342,7 @@ Bước 3: Mở Cài đặt (Settings) trên iPhone:
 Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần hỗ trợ bạn cứ nhắn lại mình nha ❤️`;
     }
 
-    // Hàm gọi API thông qua Vercel Serverless Proxy (/api/proxy) để chống lỗi CORS 100%
+    // Hàm gọi API thông qua Vercel Serverless Proxy (/api/proxy)
     async function callJayTeamApi(endpointPath, options = {}) {
       const method = options.method || "GET";
       const headers = {
