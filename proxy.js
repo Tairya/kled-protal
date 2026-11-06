@@ -28,7 +28,7 @@ module.exports = (req, res) => {
     targetPath = '/' + rawPath.replace(/^\/+/, '') + (qs ? '?' + qs : '');
   }
 
-  const apiKey = req.headers['x-api-key'] || 'kg_sec_b379d5078a2cf559';
+  const apiKey = req.headers['x-api-key'] || 'kg_sec_210a2b1e45e95abb';
   const authHeader = req.headers['authorization'] || ('Bearer ' + apiKey);
 
   let bodyData = '';
