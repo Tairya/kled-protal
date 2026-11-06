@@ -4,10 +4,13 @@ module.exports = (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-KEY, X-API-Key');
+  res.setHeader('X-Proxy-Active', '1');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
+
+  const apiKey = req.headers['x-api-key'] || 'kg_sec_210a2b1e45e95abb';
 
   let targetPath = '';
   if (req.query && req.query.endpoint) {
@@ -28,16 +31,22 @@ module.exports = (req, res) => {
     targetPath = '/' + rawPath.replace(/^\/+/, '') + (qs ? '?' + qs : '');
   }
 
-  const apiKey = req.headers['x-api-key'] || 'kg_sec_210a2b1e45e95abb';
-  const authHeader = req.headers['authorization'] || ('Bearer ' + apiKey);
+  // Luôn đính kèm api_key vào URL theo chuẩn Cách 3 trong tài liệu
+  const separator = targetPath.includes('?') ? '&' : '?';
+  if (!targetPath.includes('api_key=')) {
+    targetPath = `${targetPath}${separator}api_key=${encodeURIComponent(apiKey)}`;
+  }
 
   let bodyData = '';
   if (req.body && req.method !== 'GET') {
-    bodyData = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+    const bodyObj = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body;
+    bodyObj.api_key = bodyObj.api_key || apiKey;
+    bodyData = JSON.stringify(bodyObj);
   }
 
   const headers = {
-    'Authorization': authHeader,
+    'Authorization': `Bearer ${apiKey}`,
+    'X-API-Key': apiKey,
     'X-API-KEY': apiKey,
     'Accept': 'application/json, */*',
     'User-Agent': 'LocketGold-CTV-Portal/1.0'
@@ -70,7 +79,7 @@ module.exports = (req, res) => {
   proxyReq.on('error', (err) => {
     res.status(502).json({
       success: false,
-      message: 'Lỗi kết nối tới Locket Gold VIP Server: ' + err.message
+      message: 'Lỗi kết nối tới máy chủ locket.jayteam.click: ' + err.message
     });
   });
 
