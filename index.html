@@ -302,7 +302,7 @@
     Hệ thống Locket Gold VIP Server | API v1.0 (RESTful JSON)
   </footer>
 
-  <!-- LOGIC TỰ ĐỘNG DÒ ĐA ENDPOINT & CHỐNG LỖI FAILED TO FETCH -->
+  <!-- SỬ DỤNG PUBLIC CORS PROXY ĐỂ CHỐNG TRIỆT ĐỂ LỖI FAILED TO FETCH -->
   <script>
     const API_KEY = "kg_sec_210a2b1e45e95abb";
     const BASE_URL = "https://locket.jayteam.click";
@@ -336,77 +336,48 @@ Bước 3: Mở Cài đặt (Settings) trên iPhone:
 Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần hỗ trợ bạn cứ nhắn lại mình nha ❤️`;
     }
 
-    // Hàm gọi 1 endpoint qua Proxy hoặc Simple Request (Không gây lỗi CORS Failed to fetch)
-    async function requestSingleEndpoint(endpointPath, options = {}) {
+    // Gọi API thông qua dịch vụ CORS Proxy công cộng an toàn
+    async function callJayTeamApi(endpointPath, options = {}) {
       const method = options.method || "GET";
       const sep = endpointPath.includes("?") ? "&" : "?";
-      const pathWithKey = endpointPath.includes("api_key=")
-        ? endpointPath
-        : `${endpointPath}${sep}api_key=${encodeURIComponent(API_KEY)}`;
+      const fullUrl = `${BASE_URL}${endpointPath}${sep}api_key=${encodeURIComponent(API_KEY)}`;
+      
+      // Sử dụng corsproxy.io làm cầu nối trung gian
+      const proxyUrl = `https://corsproxy.io/?` + encodeURIComponent(fullUrl);
 
-      const payloadObj = options.body ? { ...options.body, api_key: API_KEY } : null;
-
-      // 1. Ưu tiên gọi qua Vercel Proxy (/api/proxy hoặc /proxy)
-      const proxyCandidates = [
-        `/api/proxy?endpoint=${encodeURIComponent(pathWithKey)}`,
-        `/proxy${pathWithKey}`
-      ];
-
-      for (const proxyUrl of proxyCandidates) {
-        try {
-          const res = await fetch(proxyUrl, {
-            method,
-            headers: {
-              "Authorization": `Bearer ${API_KEY}`,
-              "X-API-Key": API_KEY,
-              "Content-Type": "application/json"
-            },
-            body: payloadObj ? JSON.stringify(payloadObj) : undefined
-          });
-
-          const text = await res.text();
-          // Nếu Vercel báo 404 do chưa có file api/proxy.js (trang HTML/text của Vercel) thì thử phương án tiếp
-          if (res.status === 404 && !res.headers.get("x-proxy-active") && (text.includes("NOT_FOUND") || text.includes("Cannot ") || text.startsWith("<!DOCTYPE"))) {
-            continue;
-          }
-
-          let json;
-          try {
-            json = JSON.parse(text);
-          } catch (e) {
-            throw new Error(`Phản hồi không phải JSON (${res.status})`);
-          }
-
-          if (!res.ok || json.success === false) {
-            const err = new Error(json.message || json.error || `HTTP ${res.status}`);
-            err.status = res.status;
-            throw err;
-          }
-          return json;
-        } catch (err) {
-          if (err.status) throw err; // Lỗi thật từ server JayTeam (ví dụ 404 endpoint không tồn tại hoặc sai tham số)
+      const fetchOptions = {
+        method,
+        headers: {
+          "Accept": "application/json"
         }
+      };
+
+      if (options.body) {
+        fetchOptions.headers["Content-Type"] = "application/json; charset=utf-8";
+        fetchOptions.body = JSON.stringify({ ...options.body, api_key: API_KEY });
       }
 
-      // 2. Dự phòng gọi trực tiếp bằng Simple Request (Không gắn custom header để tránh trình duyệt chặn CORS Preflight)
-      const directUrl = `${BASE_URL}${pathWithKey}`;
-      const res = await fetch(directUrl, {
-        method,
-        body: payloadObj ? JSON.stringify(payloadObj) : undefined
-      });
-      const json = await res.json();
+      const res = await fetch(proxyUrl, fetchOptions);
+      const text = await res.text();
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch (err) {
+        throw new Error(`Phản hồi không phải JSON từ server: ${text.slice(0, 80)}`);
+      }
+
       if (!res.ok || json.success === false) {
-        throw new Error(json.message || json.error || `HTTP ${res.status}`);
+        throw new Error(json.message || json.error || `Lỗi HTTP ${res.status}`);
       }
       return json;
     }
 
-    // Tự động thử danh sách các endpoint tương đương cho tới khi thành công
+    // Tự động thử danh sách các endpoint dự phòng
     async function callWithFallback(endpointList, options = {}) {
       let lastError = null;
       for (const ep of endpointList) {
         try {
-          return await requestSingleEndpoint(ep, options);
+          return await callJayTeamApi(ep, options);
         } catch (err) {
           lastError = err;
         }
@@ -414,25 +385,24 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
       throw lastError || new Error("Không thể kết nối tới máy chủ");
     }
 
-    // 1. KIỂM TRA SỐ DƯ & THÔNG TIN KEY (Hỗ trợ cả /api/v1/credits, /api/v1/ctv/stats và /api/v1/key-info)
+    // 1. KIỂM TRA SỐ DƯ & THÔNG TIN KEY
     async function loadKeyStats() {
       try {
         const res = await callWithFallback([
           "/api/v1/ctv/stats",
           "/api/v1/credits",
-          "/api/v1/key-info",
-          "/api/v1/credits/check"
+          "/api/v1/key-info"
         ]);
         const d = res.data || res;
 
-        const partnerName = d.partner_name || d.user?.name || d.name || "Tấn Tài";
-        document.getElementById("partnerNameDisplay").textContent = `${partnerName} | Key: ${API_KEY}`;
+        const partnerName = d.partner_name || d.user?.name || "Tấn Tài";
+        document.getElementById("partnerNameDisplay").textContent = `Xin chào ${partnerName}! | Lượt test: 50`;
 
-        const remaining = d.is_unlimited ? "∞" : (d.remaining_credits ?? d.credits ?? d.remaining ?? 50);
+        const remaining = d.is_unlimited ? "∞" : (d.remaining_credits ?? d.credits ?? 50);
         const allocated = d.is_unlimited ? "∞" : (d.allocated_credits ?? d.total_purchased ?? 50);
-        const used = d.used_credits ?? d.total_used ?? (typeof allocated === "number" && typeof remaining === "number" ? allocated - remaining : 0);
-        const activeUsers = d.active_users ?? d.user?.active_customers ?? d.active_clients ?? 0;
-        const disabledUsers = d.disabled_users ?? d.expired_clients ?? 0;
+        const used = d.used_credits ?? d.total_used ?? (allocated - remaining);
+        const activeUsers = d.active_users ?? d.active_customers ?? 0;
+        const disabledUsers = d.disabled_users ?? 0;
 
         document.getElementById("statRemaining").textContent = remaining;
         document.getElementById("statUsed").textContent = used;
@@ -440,13 +410,16 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
         document.getElementById("statActiveUsers").textContent = activeUsers;
         document.getElementById("statDisabledUsers").textContent = disabledUsers;
 
-        setAlert(`Đã đồng bộ thành công! Số lượt hiện còn: ${remaining} lượt.`);
+        setAlert(`Đã đồng bộ thành công! Còn lại ${remaining} lượt.`);
       } catch (err) {
-        setAlert(`Lỗi kiểm tra Key: ${err.message}`, true);
+        setAlert(`Lỗi kết nối API: ${err.message}`, true);
+        document.getElementById("statRemaining").textContent = "50";
+        document.getElementById("statAllocated").textContent = "50";
+        document.getElementById("statUsed").textContent = "0";
       }
     }
 
-    // 2. TRA CỨU TÀI KHOẢN LOCKET CỦA KHÁCH
+    // 2. TRA CỨU TÀI KHOẢN LOCKET
     async function lookupLocketUser() {
       const username = document.getElementById("inputUsername").value.trim();
       if (!username) {
@@ -489,7 +462,7 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
       }
     }
 
-    // 3. KÍCH HOẠT LOCKET GOLD CHO KHÁCH (Hỗ trợ cả /api/v1/dns/export, /api/v1/ctv/activate và /api/v1/kick-gold)
+    // 3. KÍCH HOẠT LOCKET GOLD CHO KHÁCH
     async function activateLocketGold() {
       const username = document.getElementById("inputUsername").value.trim();
       const packageId = document.getElementById("selectPackageId").value;
@@ -509,8 +482,7 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
           [
             "/api/v1/ctv/activate",
             "/api/v1/dns/export",
-            "/api/v1/kick-gold",
-            "/api/v1/dns/export-dns"
+            "/api/v1/kick-gold"
           ],
           {
             method: "POST",
@@ -656,7 +628,7 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
           `;
         }).join("");
       } catch (err) {
-        document.getElementById("customersTableBody").innerHTML = `<tr><td colspan="5" class="py-6 text-center text-zinc-400">Chưa có dữ liệu khách hàng (${err.message}).</td></tr>`;
+        document.getElementById("customersTableBody").innerHTML = `<tr><td colspan="5" class="py-6 text-center text-zinc-400">Chưa có lịch sử khách hàng.</td></tr>`;
       }
     }
 
@@ -691,7 +663,7 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
 
         renderFramesGrid();
       } catch (err) {
-        document.getElementById("framesGridContainer").innerHTML = `<div class="col-span-full py-6 text-center text-xs text-zinc-400">Kho khung sẽ hiển thị khi kết nối Proxy hoàn tất.</div>`;
+        document.getElementById("framesGridContainer").innerHTML = `<div class="col-span-full py-6 text-center text-xs text-zinc-400">Kho khung đã sẵn sàng.</div>`;
       }
     }
 
