@@ -3,49 +3,78 @@ const https = require('https');
 module.exports = (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-API-Key');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-KEY, X-API-Key');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  const targetPath = Array.isArray(req.query.path)
-    ? '/' + req.query.path.join('/')
-    : '/' + (req.query.path || '');
+  let targetPath = '';
+  if (req.query && req.query.endpoint) {
+    targetPath = req.query.endpoint.startsWith('/')
+      ? req.query.endpoint
+      : '/' + req.query.endpoint;
+  } else {
+    const rawPath = Array.isArray(req.query.path)
+      ? req.query.path.join('/')
+      : (req.query.path || '');
+    const queryParams = new URLSearchParams();
+    Object.keys(req.query || {}).forEach((key) => {
+      if (key !== 'path') {
+        queryParams.append(key, req.query[key]);
+      }
+    });
+    const qs = queryParams.toString();
+    targetPath = '/' + rawPath.replace(/^\/+/, '') + (qs ? '?' + qs : '');
+  }
 
-  const bodyData = req.body && Object.keys(req.body).length > 0 
-    ? JSON.stringify(req.body) 
-    : '';
+  const apiKey = req.headers['x-api-key'] || 'kg_sec_b379d5078a2cf559';
+  const authHeader = req.headers['authorization'] || ('Bearer ' + apiKey);
+
+  let bodyData = '';
+  if (req.body && req.method !== 'GET') {
+    bodyData = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+  }
+
+  const headers = {
+    'Authorization': authHeader,
+    'X-API-KEY': apiKey,
+    'Accept': 'application/json, */*',
+    'User-Agent': 'LocketGold-CTV-Portal/1.0'
+  };
+
+  if (bodyData) {
+    headers['Content-Type'] = 'application/json; charset=utf-8';
+    headers['Content-Length'] = Buffer.byteLength(bodyData);
+  }
 
   const options = {
-    hostname: '180.93.61.146',
+    hostname: 'locket.jayteam.click',
     port: 443,
     path: targetPath,
     method: req.method,
     rejectUnauthorized: false,
-    headers: {
-      'X-API-Key': req.headers['x-api-key'] || '',
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    }
+    headers: headers
   };
 
   const proxyReq = https.request(options, (proxyRes) => {
-    let data = '';
-    proxyRes.on('data', (chunk) => (data += chunk));
+    const chunks = [];
+    proxyRes.on('data', (chunk) => chunks.push(chunk));
     proxyRes.on('end', () => {
-      res.status(proxyRes.statusCode).setHeader('Content-Type', 'application/json').send(data);
+      const buffer = Buffer.concat(chunks);
+      const contentType = proxyRes.headers['content-type'] || 'application/json; charset=utf-8';
+      res.status(proxyRes.statusCode).setHeader('Content-Type', contentType).send(buffer);
     });
   });
 
   proxyReq.on('error', (err) => {
     res.status(502).json({
       success: false,
-      message: 'Lỗi kết nối tới JayDev Server: ' + err.message
+      message: 'Lỗi kết nối tới Locket Gold VIP Server: ' + err.message
     });
   });
 
-  if (bodyData && req.method !== 'GET') {
+  if (bodyData) {
     proxyReq.write(bodyData);
   }
   proxyReq.end();
