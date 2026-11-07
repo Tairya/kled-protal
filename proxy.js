@@ -10,7 +10,10 @@ module.exports = (req, res) => {
     return res.status(200).end();
   }
 
-  const apiKey = req.headers['x-api-key'] || 'kg_sec_210a2b1e45e95abb';
+ const apiKey = process.env.LOCKET_API_KEY;
+if (!apiKey) {
+  return res.status(500).json({ success: false, message: 'Thiếu biến môi trường LOCKET_API_KEY' });
+}
 
   let targetPath = '';
   if (req.query && req.query.endpoint) {
