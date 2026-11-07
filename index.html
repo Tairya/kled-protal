@@ -364,9 +364,10 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
         throw new Error(`Phản hồi không phải JSON từ server: ${text.slice(0, 80)}`);
       }
 
-      if (!res.ok || json.success === false) {
-        throw new Error(json.message || json.error || `Lỗi HTTP ${res.status}`);
-      }
+     if (!res.ok || json.success === false) {
+  const m = json.message || json.error || `Lỗi HTTP ${res.status}`;
+  throw new Error(typeof m === "object" ? JSON.stringify(m) : m);
+     }
       return json;
     }
 
