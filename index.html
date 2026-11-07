@@ -374,14 +374,16 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
     // Tự động thử danh sách các endpoint dự phòng
     async function callWithFallback(endpointList, options = {}) {
       let lastError = null;
+      let firstError = null; 
       for (const ep of endpointList) {
         try {
           return await callJayTeamApi(ep, options);
         } catch (err) {
-          lastError = err;
-        }
-      }
-      throw lastError || new Error("Không thể kết nối tới máy chủ");
+          if (!firstError) firstError = err;   // THÊM
+      lastError = err;
+    }
+  }
+  throw firstError || lastError || new Error("Không thể kết nối tới máy chủ");
     }
 
     // 1. KIỂM TRA SỐ DƯ & THÔNG TIN KEY
