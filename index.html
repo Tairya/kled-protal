@@ -337,27 +337,25 @@ Mở lại Locket và trải nghiệm trọn bộ tính năng VIP nhé! Cần h�
     }
 
     // Gọi API thông qua dịch vụ CORS Proxy công cộng an toàn
-    async function callJayTeamApi(endpointPath, options = {}) {
-      const method = options.method || "GET";
-      const sep = endpointPath.includes("?") ? "&" : "?";
-      const fullUrl = `${BASE_URL}${endpointPath}${sep}api_key=${encodeURIComponent(API_KEY)}`;
-      
-      // Sử dụng corsproxy.io làm cầu nối trung gian
-      const proxyUrl = `https://corsproxy.io/?` + encodeURIComponent(fullUrl);
+   async function callJayTeamApi(endpointPath, options = {}) {
+  const method = options.method || "GET";
+  // Gọi proxy của chính web mình trên Vercel
+  const proxyUrl = `/api/proxy?endpoint=` + encodeURIComponent(endpointPath);
 
-      const fetchOptions = {
-        method,
-        headers: {
-          "Accept": "application/json"
-        }
-      };
+  const fetchOptions = {
+    method,
+    headers: { "Accept": "application/json" }
+  };
 
-      if (options.body) {
-        fetchOptions.headers["Content-Type"] = "application/json; charset=utf-8";
-        fetchOptions.body = JSON.stringify({ ...options.body, api_key: API_KEY });
-      }
+  if (options.body) {
+    fetchOptions.headers["Content-Type"] = "application/json; charset=utf-8";
+    fetchOptions.body = JSON.stringify(options.body);
+  }
 
-      const res = await fetch(proxyUrl, fetchOptions);
+  const res = await fetch(proxyUrl, fetchOptions);
+  // ... phần còn lại (const text = await res.text(); ...) giữ nguyên
+
+     
       const text = await res.text();
       let json;
       try {
